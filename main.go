@@ -6,8 +6,9 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"time"
-
+	"github.com/joho/godotenv"
 	"github.com/jasonlvhit/gocron"
 )
 
@@ -61,9 +62,14 @@ func MoveFile(sourcePath, destPath string) error {
 }
 
 func Task() {
-	sourceLocation := ""
-	copyLocation := ""
-	moveLocation := ""
+  err := godotenv.Load()
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	sourceLocation := os.Getenv("SOURCE_LOACATION")
+	copyLocation := os.Getenv("COPY_LOCATION")
+	moveLocation := os.Getenv("MOVE_LOCATION")
 	now := time.Now()
 	files, err := ioutil.ReadDir(sourceLocation)
 	if err != nil {
@@ -71,9 +77,9 @@ func Task() {
 	}
 
 	for _, file := range files {
-		Copy(sourceLocation+file.Name(), copyLocation+file.Name())
-		MoveFile(sourceLocation+file.Name(), moveLocation+file.Name())
-		fmt.Printf("%s finish %s", now, file.Name())
+		Copy(filepath.Join(sourceLocation, file.Name()), filepath.Join(copyLocation, file.Name()))
+		MoveFile(filepath.Join(sourceLocation, file.Name()), filepath.Join(moveLocation, file.Name()))
+		fmt.Printf("%s finish %s", now, file.Name() + "\n")
 	}
 }
 
